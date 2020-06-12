@@ -1,4 +1,4 @@
-mixin Dynamic {
+class Dynamic {
   final Map<String, dynamic> _data = Map();
   @override
   dynamic noSuchMethod(Invocation invocation) {
