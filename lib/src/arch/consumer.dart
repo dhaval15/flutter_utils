@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 typedef ConsumerWidgetBuilder<T> = Widget Function(
-    BuildContext context, T state);
+    BuildContext context, Model<T> model);
 
 typedef UpdateFlowDecider<T> = UpdateFlow Function(
-    BuildContext context, T state);
+    BuildContext context, Model<T> model);
 
 class Consumer<T> extends StatefulWidget {
   final ConsumerWidgetBuilder<T> builder;
@@ -36,8 +36,7 @@ class _ConsumerState<T> extends State<Consumer<T>> {
   }
 
   bool _onUpdate() {
-    final flow =
-        widget?.flow?.call(context, model.state) ?? UpdateFlow.propogate;
+    final flow = widget?.flow?.call(context, model) ?? UpdateFlow.propogate;
     switch (flow) {
       case UpdateFlow.propogate:
         setState(() {});
@@ -52,7 +51,7 @@ class _ConsumerState<T> extends State<Consumer<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return widget?.builder?.call(context, model.state) ?? widget.child;
+    return widget?.builder?.call(context, model) ?? widget.child;
   }
 }
 
