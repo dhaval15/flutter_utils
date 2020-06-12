@@ -27,5 +27,11 @@ dependencies:
   Includes Varius Utility for following some design patterns in architecting an app.
   ```
 
+- **structures**
+
+  ```
+  Includes Varius Data Structures.
+  ```
+
   
 
