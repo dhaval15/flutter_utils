@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 typedef ConsumerWidgetBuilder<T> = Widget Function(
     BuildContext context, Model<T> model);
 
-typedef UpdateFlowDecider<T> = UpdateFlow Function(
+typedef UpdateFlowDecider<T> = Future<UpdateFlow> Function(
     BuildContext context, Model<T> model);
 
 class Consumer<T> extends StatefulWidget {
@@ -35,8 +35,9 @@ class _ConsumerState<T> extends State<Consumer<T>> {
     model._remove(_onUpdate);
   }
 
-  bool _onUpdate() {
-    final flow = widget?.flow?.call(context, model) ?? UpdateFlow.propogate;
+  Future<bool> _onUpdate() async {
+    final flow =
+        await widget?.flow?.call(context, model) ?? UpdateFlow.propogate;
     switch (flow) {
       case UpdateFlow.propogate:
         setState(() {});
@@ -76,7 +77,7 @@ class Provider extends InheritedWidget {
   }
 }
 
-typedef NotifyListener = bool Function();
+typedef NotifyListener = Future<bool> Function();
 
 class Model<S> with Notify {
   Model(this._state);
@@ -99,9 +100,9 @@ mixin Notify {
     _listeners.remove(listener);
   }
 
-  void _notify() {
+  void _notify() async {
     for (final listener in _listeners) {
-      if (!listener.call()) break;
+      if (!(await listener.call())) break;
     }
   }
 }
