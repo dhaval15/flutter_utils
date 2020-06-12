@@ -9,7 +9,7 @@ typedef UpdateFlowDecider<T> = UpdateFlow Function(
 
 class Consumer<T> extends StatefulWidget {
   final ConsumerWidgetBuilder<T> builder;
-  final UpdateFlowDecider flow;
+  final UpdateFlowDecider<T> flow;
   final Widget child;
 
   const Consumer({Key key, this.builder, this.flow, this.child})
