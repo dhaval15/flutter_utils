@@ -33,5 +33,10 @@ dependencies:
   Includes Varius Data Structures.
   ```
 
+- **database**
+
+  ```
+  Includes Varius Database wrappers.
+  ```
   
 

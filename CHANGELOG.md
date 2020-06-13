@@ -9,3 +9,7 @@
 ## [0.0.2]
 	Added Structures:
 		Dynamic Mixin
+
+## [0.0.3]
+	Added Database
+		Sembast Api

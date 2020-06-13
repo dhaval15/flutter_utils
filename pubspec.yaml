@@ -1,13 +1,14 @@
 name: flutter_utils
 description: A new Flutter package project.
-version: 0.0.1
-author:
-homepage:
+version: 0.0.3
+author: dhavalpatel32768@gmail.com
+homepage: dhaval15.github.io
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  sembast: ^2.4.4+1
   flutter:
     sdk: flutter
 
