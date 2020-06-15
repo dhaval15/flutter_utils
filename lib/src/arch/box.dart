@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +16,8 @@ typedef RebuildActionDecider<T> = Future<RebuildAction> Function(
     BuildContext context, T oldState, T newState);
 
 typedef NotifyListener<T> = Future<bool> Function(T oldState, T newState);
+
+typedef Reducer<T> = FutureOr<T> Function(T data);
 
 class Producer<T> extends StatelessWidget {
   final ProducerWidgetBuilder<T> builder;
@@ -150,36 +154,42 @@ class Box<S> with Notify, Dispatcher<S> {
   S state;
 
   @override
-  void mutate(S Function(S) mutation) {
+  void mutate(Reducer mutation) {
     state = mutation(state);
   }
 
   @override
-  void dispatch({Future<S> Function(S) action, bool notify = true}) async {
-    final oldState = state;
-    final newState = action != null ? await action(state) : state;
-    state = newState;
-    if (notify) _notify(oldState, newState);
+  void mutateMultiple(List<Reducer> mutations) {
+    for (final mutation in mutations) {
+      mutate(mutation);
+    }
   }
 
   @override
-  void dispatchMultiple(
-      {List<Future<S> Function(S)> actions, bool notify = true}) async {
+  void dispatch(Reducer action) async {
+    final oldState = state;
+    final newState = action != null ? await action(state) : state;
+    state = newState;
+    _notify(oldState, newState);
+  }
+
+  @override
+  void dispatchMultiple(List<Reducer> actions) async {
     final oldState = state;
     var newState = state;
     for (final action in (actions ?? [])) {
       newState = await action(newState);
     }
     state = newState;
-    if (notify) _notify(oldState, newState);
+    _notify(oldState, newState);
   }
 }
 
 mixin Dispatcher<S> {
-  void mutate(S Function(S) mutation);
-  void dispatch({Future<S> Function(S) action, bool notify = true});
-  void dispatchMultiple(
-      {List<Future<S> Function(S)> actions, bool notify = true});
+  void mutate(Reducer mutation);
+  void mutateMultiple(List<Reducer> mutations);
+  void dispatch(Reducer action);
+  void dispatchMultiple(List<Reducer> actions);
 }
 
 mixin Notify<T> {
