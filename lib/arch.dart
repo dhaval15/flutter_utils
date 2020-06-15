@@ -1,2 +1,2 @@
-export 'src/arch/consumer.dart';
+export 'src/arch/box.dart';
 export 'src/arch/functional.dart';

@@ -12,6 +12,17 @@ typedef RebuildActionDecider<T> = Future<RebuildAction> Function(
 
 typedef NotifyListener<T> = Future<bool> Function(T oldState, T newState);
 
+class Producer<T> extends StatelessWidget {
+  final ProducerWidgetBuilder builder;
+
+  const Producer({Key key, @required this.builder}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final box = Provider.of<T>(context);
+    return builder(context, box);
+  }
+}
+
 class Consumer<T> extends StatefulWidget {
   final ConsumerWidgetBuilder<T> builder;
   final RebuildActionDecider<T> flow;
@@ -22,17 +33,6 @@ class Consumer<T> extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _ConsumerState<T>();
-  }
-}
-
-class Producer<T> extends StatelessWidget {
-  final ProducerWidgetBuilder builder;
-
-  const Producer({Key key, @required this.builder}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    final box = Provider.of<T>(context);
-    return builder(context, box);
   }
 }
 
