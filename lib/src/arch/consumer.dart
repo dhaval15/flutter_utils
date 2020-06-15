@@ -88,6 +88,13 @@ class Model<S> with Notify {
     _state = state;
     if (notify) _notify(old);
   }
+
+  void dispatch(Future<S> Function(S) action, {bool notify = true}) async {
+    final oldState = _state;
+    final newState = await action(_state);
+    _state = newState;
+    if (notify) _notify(oldState);
+  }
 }
 
 mixin Notify<S> {
