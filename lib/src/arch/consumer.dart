@@ -83,10 +83,10 @@ class Model<S> with Notify {
   Model(this._state);
   S _state;
   S get state => _state;
-  set state(S state) {
+  void setState(S state, {bool notify = true}) {
     final old = _state;
     _state = state;
-    _notify(old);
+    if (notify) _notify(old);
   }
 }
 
