@@ -94,35 +94,37 @@ class Provider extends InheritedWidget {
 }
 
 class Box<S> with Notify, Dispatcher<S> {
-  Box(this._state);
-  S _state;
-  S get state => _state;
-  set state(S state) {
-    _state = state;
+  Box(this.state);
+  S state;
+
+  @override
+  void mutate(S Function(S) mutation) {
+    state = mutation(state);
   }
 
   @override
   void dispatch({Future<S> Function(S) action, bool notify = true}) async {
-    final oldState = _state;
-    final newState = action != null ? await action(_state) : _state;
-    _state = newState;
+    final oldState = state;
+    final newState = action != null ? await action(state) : state;
+    state = newState;
     if (notify) _notify(oldState, newState);
   }
 
   @override
   void dispatchMultiple(
       {List<Future<S> Function(S)> actions, bool notify = true}) async {
-    final oldState = _state;
-    var newState = _state;
+    final oldState = state;
+    var newState = state;
     for (final action in (actions ?? [])) {
       newState = await action(newState);
     }
-    _state = newState;
+    state = newState;
     if (notify) _notify(oldState, newState);
   }
 }
 
 mixin Dispatcher<S> {
+  void mutate(S Function(S) mutation);
   void dispatch({Future<S> Function(S) action, bool notify = true});
   void dispatchMultiple(
       {List<Future<S> Function(S)> actions, bool notify = true});
