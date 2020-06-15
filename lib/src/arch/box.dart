@@ -7,6 +7,9 @@ typedef ConsumerWidgetBuilder<T> = Widget Function(
 typedef ProducerWidgetBuilder<T> = Widget Function(
     BuildContext context, Dispatcher<T> dispatcher);
 
+typedef ProducingConsumerWidgetBuilder<T> = Widget Function(
+    BuildContext context, Dispatcher<T> dispatcher, T state);
+
 typedef RebuildActionDecider<T> = Future<RebuildAction> Function(
     BuildContext context, T oldState, T newState);
 
@@ -37,6 +40,55 @@ class Consumer<T> extends StatefulWidget {
 }
 
 class _ConsumerState<T> extends State<Consumer<T>> {
+  Box<T> model;
+  @override
+  void initState() {
+    super.initState();
+    model = Provider.of<T>(context);
+    model._add(_onUpdate);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    model._remove(_onUpdate);
+  }
+
+  Future<bool> _onUpdate(T oldState, T newState) async {
+    final rebuild = await widget?.rebuild?.call(context, oldState, newState) ??
+        RebuildAction.rebuild;
+    switch (rebuild) {
+      case RebuildAction.rebuild:
+        setState(() {});
+        return true;
+      case RebuildAction.skip:
+        return true;
+      case RebuildAction.stop:
+        return false;
+    }
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget?.builder?.call(context, model.state) ?? widget.child;
+  }
+}
+
+class ProducingConsumer<T> extends StatefulWidget {
+  final ConsumerWidgetBuilder<T> builder;
+  final RebuildActionDecider<T> rebuild;
+  final Widget child;
+
+  const ProducingConsumer({Key key, this.builder, this.rebuild, this.child})
+      : super(key: key);
+  @override
+  State<StatefulWidget> createState() {
+    return _ProducingConsumerState<T>();
+  }
+}
+
+class _ProducingConsumerState<T> extends State<ProducingConsumer<T>> {
   Box<T> model;
   @override
   void initState() {
