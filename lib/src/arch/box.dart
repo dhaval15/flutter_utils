@@ -25,10 +25,10 @@ class Producer<T> extends StatelessWidget {
 
 class Consumer<T> extends StatefulWidget {
   final ConsumerWidgetBuilder<T> builder;
-  final RebuildActionDecider<T> flow;
+  final RebuildActionDecider<T> rebuild;
   final Widget child;
 
-  const Consumer({Key key, this.builder, this.flow, this.child})
+  const Consumer({Key key, this.builder, this.rebuild, this.child})
       : super(key: key);
   @override
   State<StatefulWidget> createState() {
@@ -52,9 +52,9 @@ class _ConsumerState<T> extends State<Consumer<T>> {
   }
 
   Future<bool> _onUpdate(T oldState, T newState) async {
-    final flow = await widget?.flow?.call(context, oldState, newState) ??
+    final rebuild = await widget?.rebuild?.call(context, oldState, newState) ??
         RebuildAction.rebuild;
-    switch (flow) {
+    switch (rebuild) {
       case RebuildAction.rebuild:
         setState(() {});
         return true;
