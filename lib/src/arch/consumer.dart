@@ -5,7 +5,7 @@ typedef ConsumerWidgetBuilder<T> = Widget Function(
     BuildContext context, Model<T> model);
 
 typedef UpdateFlowDecider<T> = Future<UpdateFlow> Function(
-    BuildContext context, Model<T> model);
+    BuildContext context, T oldState, T newState);
 
 class Consumer<T> extends StatefulWidget {
   final ConsumerWidgetBuilder<T> builder;
@@ -35,9 +35,9 @@ class _ConsumerState<T> extends State<Consumer<T>> {
     model._remove(_onUpdate);
   }
 
-  Future<bool> _onUpdate() async {
-    final flow =
-        await widget?.flow?.call(context, model) ?? UpdateFlow.propogate;
+  Future<bool> _onUpdate(T old) async {
+    final flow = await widget?.flow?.call(context, old, model.state) ??
+        UpdateFlow.propogate;
     switch (flow) {
       case UpdateFlow.propogate:
         setState(() {});
@@ -77,32 +77,33 @@ class Provider extends InheritedWidget {
   }
 }
 
-typedef NotifyListener = Future<bool> Function();
+typedef NotifyListener<S> = Future<bool> Function(S old);
 
 class Model<S> with Notify {
   Model(this._state);
   S _state;
   S get state => _state;
   set state(S state) {
+    final old = _state;
     _state = state;
-    _notify();
+    _notify(old);
   }
 }
 
-mixin Notify {
-  final ObserverList<NotifyListener> _listeners = ObserverList();
+mixin Notify<S> {
+  final ObserverList<NotifyListener<S>> _listeners = ObserverList();
 
-  void _add(NotifyListener listener) {
+  void _add(NotifyListener<S> listener) {
     _listeners.add(listener);
   }
 
-  void _remove(NotifyListener listener) {
+  void _remove(NotifyListener<S> listener) {
     _listeners.remove(listener);
   }
 
-  void _notify() async {
+  void _notify(S old) async {
     for (final listener in _listeners) {
-      if (!(await listener.call())) break;
+      if (!(await listener.call(old))) break;
     }
   }
 }
