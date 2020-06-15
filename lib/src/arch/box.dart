@@ -149,24 +149,24 @@ class Provider extends InheritedWidget {
   }
 }
 
-class Box<S> with Notify, Dispatcher<S> {
+class Box<T> with Notify, Dispatcher<T> {
   Box(this.state);
-  S state;
+  T state;
 
   @override
-  void mutate(Reducer mutation) {
+  void mutate(Reducer<T> mutation) {
     state = mutation(state);
   }
 
   @override
-  void mutateMultiple(List<Reducer> mutations) {
+  void mutateMultiple(List<Reducer<T>> mutations) {
     for (final mutation in mutations) {
       mutate(mutation);
     }
   }
 
   @override
-  void dispatch(Reducer action) async {
+  void dispatch(Reducer<T> action) async {
     final oldState = state;
     final newState = action != null ? await action(state) : state;
     state = newState;
@@ -174,7 +174,7 @@ class Box<S> with Notify, Dispatcher<S> {
   }
 
   @override
-  void dispatchMultiple(List<Reducer> actions) async {
+  void dispatchMultiple(List<Reducer<T>> actions) async {
     final oldState = state;
     var newState = state;
     for (final action in (actions ?? [])) {
@@ -185,11 +185,11 @@ class Box<S> with Notify, Dispatcher<S> {
   }
 }
 
-mixin Dispatcher<S> {
-  void mutate(Reducer mutation);
-  void mutateMultiple(List<Reducer> mutations);
-  void dispatch(Reducer action);
-  void dispatchMultiple(List<Reducer> actions);
+mixin Dispatcher<T> {
+  void mutate(Reducer<T> mutation);
+  void mutateMultiple(List<Reducer<T>> mutations);
+  void dispatch(Reducer<T> action);
+  void dispatchMultiple(List<Reducer<T>> actions);
 }
 
 mixin Notify<T> {
