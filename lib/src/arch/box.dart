@@ -76,7 +76,7 @@ class _ConsumerState<T> extends State<Consumer<T>> {
 }
 
 class ProducingConsumer<T> extends StatefulWidget {
-  final ConsumerWidgetBuilder<T> builder;
+  final ProducingConsumerWidgetBuilder<T> builder;
   final RebuildActionDecider<T> rebuild;
   final Widget child;
 
@@ -120,7 +120,7 @@ class _ProducingConsumerState<T> extends State<ProducingConsumer<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return widget?.builder?.call(context, model.state) ?? widget.child;
+    return widget?.builder?.call(context, model, model.state) ?? widget.child;
   }
 }
 
