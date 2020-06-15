@@ -12,7 +12,7 @@ typedef ProducerWidgetBuilder<T> = Widget Function(
 typedef ProducingConsumerWidgetBuilder<T> = Widget Function(
     BuildContext context, Dispatcher<T> dispatcher, T state);
 
-typedef RebuildActionDecider<T> = Future<RebuildAction> Function(
+typedef RebuildActionDecider<T> = FutureOr<RebuildAction> Function(
     BuildContext context, T oldState, T newState);
 
 typedef NotifyListener<T> = Future<bool> Function(T oldState, T newState);
