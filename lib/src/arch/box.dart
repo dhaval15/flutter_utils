@@ -13,7 +13,7 @@ typedef RebuildActionDecider<T> = Future<RebuildAction> Function(
 typedef NotifyListener<T> = Future<bool> Function(T oldState, T newState);
 
 class Producer<T> extends StatelessWidget {
-  final ProducerWidgetBuilder builder;
+  final ProducerWidgetBuilder<T> builder;
 
   const Producer({Key key, @required this.builder}) : super(key: key);
   @override
