@@ -32,10 +32,8 @@ class Producer<T> extends StatelessWidget {
 class Consumer<T> extends StatefulWidget {
   final ConsumerWidgetBuilder<T> builder;
   final RebuildActionDecider<T> rebuild;
-  final Widget child;
 
-  const Consumer({Key key, this.builder, this.rebuild, this.child})
-      : super(key: key);
+  const Consumer({Key key, this.builder, this.rebuild}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return _ConsumerState<T>();
@@ -74,16 +72,15 @@ class _ConsumerState<T> extends State<Consumer<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return widget?.builder?.call(context, model.state) ?? widget.child;
+    return widget.builder(context, model.state);
   }
 }
 
 class ProducingConsumer<T> extends StatefulWidget {
   final ProducingConsumerWidgetBuilder<T> builder;
   final RebuildActionDecider<T> rebuild;
-  final Widget child;
 
-  const ProducingConsumer({Key key, this.builder, this.rebuild, this.child})
+  const ProducingConsumer({Key key, this.builder, this.rebuild})
       : super(key: key);
   @override
   State<StatefulWidget> createState() {
@@ -123,7 +120,7 @@ class _ProducingConsumerState<T> extends State<ProducingConsumer<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return widget?.builder?.call(context, model, model.state) ?? widget.child;
+    return widget.builder(context, model, model.state);
   }
 }
 
