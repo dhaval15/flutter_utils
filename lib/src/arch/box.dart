@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'functional.dart';
+
 typedef ConsumerWidgetBuilder<T> = Widget Function(
     BuildContext context, T state);
 
@@ -15,8 +17,6 @@ typedef RebuildActionDecider<T> = FutureOr<RebuildAction> Function(
     BuildContext context, T oldState, T newState);
 
 typedef NotifyListener<T> = Future<bool> Function(T oldState, T newState);
-
-typedef Reducer<T> = FutureOr<T> Function(T data);
 
 class Producer<T> extends StatelessWidget {
   final ProducerWidgetBuilder<T> builder;
@@ -153,46 +153,35 @@ class Box<T> with Notify, Dispatcher<T> {
   T state;
 
   @override
-  Future<T> mutate(Reducer<T> mutation) async {
+  T mutate(Reducer<T> mutation) {
+    state = mutation(state);
+    return state;
+  }
+
+  @override
+  Future<T> mutateAsync(AsyncReducer<T> mutation) async {
     state = await mutation(state);
     return state;
   }
 
   @override
-  Future<T> mutateMultiple(List<Reducer<T>> mutations) async {
-    for (final mutation in mutations) {
-      await mutate(mutation);
-    }
+  T dispatch(Reducer<T> action) {
+    _notify(state, mutate(action));
     return state;
   }
 
   @override
-  Future<T> dispatch(Reducer<T> action) async {
-    final oldState = state;
-    final newState = action != null ? await action(state) : state;
-    state = newState;
-    _notify(oldState, newState);
-    return state;
-  }
-
-  @override
-  Future<T> dispatchMultiple(List<Reducer<T>> actions) async {
-    final oldState = state;
-    var newState = state;
-    for (final action in (actions ?? [])) {
-      newState = await action(newState);
-    }
-    state = newState;
-    _notify(oldState, newState);
+  Future<T> dispatchAsync(AsyncReducer<T> action) async {
+    _notify(state, await mutateAsync(action));
     return state;
   }
 }
 
 mixin Dispatcher<T> {
-  Future<T> mutate(Reducer<T> mutation);
-  Future<T> mutateMultiple(List<Reducer<T>> mutations);
-  Future<T> dispatch(Reducer<T> action);
-  Future<T> dispatchMultiple(List<Reducer<T>> actions);
+  T mutate(Reducer<T> mutation);
+  Future<T> mutateAsync(AsyncReducer<T> mutation);
+  T dispatch(Reducer<T> action);
+  Future<T> dispatchAsync(AsyncReducer<T> action);
 }
 
 mixin Notify<T> {

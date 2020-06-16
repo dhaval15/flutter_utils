@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class FunctionalWidget extends StatefulWidget {
@@ -30,3 +31,32 @@ class _FunctionalWidgetState extends State<FunctionalWidget> {
   }
 }
 
+typedef Reducer<T> = T Function(T data);
+
+typedef AsyncReducer<T> = FutureOr<T> Function(T data);
+
+class CombinedReducer<T> {
+  final List<Reducer> _reducers;
+
+  CombinedReducer(this._reducers);
+  T call(T data) {
+    T newData = data;
+    for (final reducer in _reducers) {
+      newData = reducer(newData);
+    }
+    return newData;
+  }
+}
+
+class CombinedAsyncReducer<T> {
+  final List<AsyncReducer> _reducers;
+
+  CombinedAsyncReducer(this._reducers);
+  FutureOr<T> call(T data) async {
+    var newData = data;
+    for (final reducer in _reducers) {
+      newData = await reducer(newData);
+    }
+    return newData;
+  }
+}
