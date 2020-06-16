@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -154,27 +153,30 @@ class Box<T> with Notify, Dispatcher<T> {
   T state;
 
   @override
-  void mutate(Reducer<T> mutation) {
-    state = mutation(state);
+  Future<T> mutate(Reducer<T> mutation) async {
+    state = await mutation(state);
+    return state;
   }
 
   @override
-  void mutateMultiple(List<Reducer<T>> mutations) {
+  Future<T> mutateMultiple(List<Reducer<T>> mutations) async {
     for (final mutation in mutations) {
-      mutate(mutation);
+      await mutate(mutation);
     }
+    return state;
   }
 
   @override
-  void dispatch(Reducer<T> action) async {
+  Future<T> dispatch(Reducer<T> action) async {
     final oldState = state;
     final newState = action != null ? await action(state) : state;
     state = newState;
     _notify(oldState, newState);
+    return state;
   }
 
   @override
-  void dispatchMultiple(List<Reducer<T>> actions) async {
+  Future<T> dispatchMultiple(List<Reducer<T>> actions) async {
     final oldState = state;
     var newState = state;
     for (final action in (actions ?? [])) {
@@ -182,14 +184,15 @@ class Box<T> with Notify, Dispatcher<T> {
     }
     state = newState;
     _notify(oldState, newState);
+    return state;
   }
 }
 
 mixin Dispatcher<T> {
-  void mutate(Reducer<T> mutation);
-  void mutateMultiple(List<Reducer<T>> mutations);
-  void dispatch(Reducer<T> action);
-  void dispatchMultiple(List<Reducer<T>> actions);
+  Future<T> mutate(Reducer<T> mutation);
+  Future<T> mutateMultiple(List<Reducer<T>> mutations);
+  Future<T> dispatch(Reducer<T> action);
+  Future<T> dispatchMultiple(List<Reducer<T>> actions);
 }
 
 mixin Notify<T> {
