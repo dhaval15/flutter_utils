@@ -8,7 +8,6 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  functional: ^0.9.3
   sembast: ^2.4.4+1
   flutter:
     sdk: flutter
