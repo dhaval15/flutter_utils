@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:sembast/sembast.dart';
 
-Future<String> insert(Database database, StoreRef storeRef, Map value) async {
+Future<String> insert(
+    Database database, StoreRef<String, dynamic> storeRef, Map value) async {
   Completer<String> completer = Completer();
   await database.transaction((txn) async {
     String key = await storeRef.add(txn, value);
@@ -12,34 +13,40 @@ Future<String> insert(Database database, StoreRef storeRef, Map value) async {
   return completer.future;
 }
 
-Future<void> update(Database database, StoreRef storeRef, Map value) async {
+Future<void> update(
+    Database database, StoreRef<String, dynamic> storeRef, Map value) async {
   final record = storeRef.record(value['k']);
   return record.update(database, value);
 }
 
-Future<void> delete(Database database, StoreRef storeRef, String key) {
+Future<void> delete(
+    Database database, StoreRef<String, dynamic> storeRef, String key) {
   final record = storeRef.record(key);
   return record.delete(database);
 }
 
-Future<RecordSnapshot> get(Database database, StoreRef storeRef, String key) {
+Future<RecordSnapshot> get(
+    Database database, StoreRef<String, dynamic> storeRef, String key) {
   return storeRef.findFirst(database,
       finder: Finder(filter: Filter.byKey(key)));
 }
 
-Future<List<RecordSnapshot>> find(Database database, StoreRef storeRef,
+Future<List<RecordSnapshot>> find(
+    Database database, StoreRef<String, dynamic> storeRef,
     {Finder finder}) {
   return storeRef.find(database, finder: finder);
 }
 
-Future<void> deleteFound(Database database, StoreRef storeRef, Finder finder) {
+Future<void> deleteFound(
+    Database database, StoreRef<String, dynamic> storeRef, Finder finder) {
   return storeRef.delete(database, finder: finder);
 }
 
-Future<int> count(Database database, StoreRef storeRef, {Filter filter}) {
+Future<int> count(Database database, StoreRef<String, dynamic> storeRef,
+    {Filter filter}) {
   return storeRef.count(database, filter: filter);
 }
 
-Future deleteStore(Database database, StoreRef storeRef) {
+Future deleteStore(Database database, StoreRef<String, dynamic> storeRef) {
   return storeRef.drop(database);
 }
